@@ -1,5 +1,6 @@
 package com.tradlinx.account;
 
+import com.tradlinx.account.form.LoginForm;
 import com.tradlinx.account.form.NewAccountForm;
 import com.tradlinx.account.form.SignUpForm;
 import lombok.RequiredArgsConstructor;
@@ -18,4 +19,12 @@ public class AccountController {
         return accountService.processNewAccount(signUpForm);
     }
 
+    @PostMapping("/signin")
+    public AccessToken login(@RequestBody LoginForm loginForm) {
+        Account account = accountService.processLogin(loginForm);
+        if (account == null) {
+            return new AccessToken("Authorization : No!!");
+        }
+        return new AccessToken("Authorization: Bearer JwtToken");
+    }
 }

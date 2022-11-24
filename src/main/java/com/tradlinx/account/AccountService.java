@@ -1,5 +1,6 @@
 package com.tradlinx.account;
 
+import com.tradlinx.account.form.LoginForm;
 import com.tradlinx.account.form.NewAccountForm;
 import com.tradlinx.account.form.SignUpForm;
 import lombok.RequiredArgsConstructor;
@@ -17,4 +18,9 @@ public class AccountService {
         Account account = accountRepository.save(modelMapper.map(signUpForm, Account.class));
         return modelMapper.map(account, NewAccountForm.class);
     }
+
+    public Account processLogin(LoginForm loginForm) {
+        return accountRepository.findByUseridAndPw(loginForm.getUserid(), loginForm.getPw());
+    }
+
 }
