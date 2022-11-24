@@ -3,9 +3,7 @@ package com.tradlinx.account.form;
 import lombok.Data;
 
 @Data
-public class NewAccountForm {
-
+public class NewSignUpDto {
     private String userid;
-    private String pw;
     private String username;
 }

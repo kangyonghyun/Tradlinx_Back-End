@@ -1,9 +1,7 @@
 package com.tradlinx.account;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.tradlinx.account.form.NewAccountForm;
-import com.tradlinx.account.form.SignUpForm;
-import org.assertj.core.api.Assertions;
+import com.tradlinx.account.form.SignUpDto;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,9 +12,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -33,14 +29,14 @@ class AccountControllerTest {
     @Test
     @DisplayName("회원 가입 - 성공")
     void signUp_correct_input() throws Exception {
-        SignUpForm signUpForm = new SignUpForm();
-        signUpForm.setUserid("userid");
-        signUpForm.setPw("passw0rd");
-        signUpForm.setUsername("username");
+        SignUpDto signUpDto = new SignUpDto();
+        signUpDto.setUserid("userid");
+        signUpDto.setPw("passw0rd");
+        signUpDto.setUsername("username");
 
         MvcResult result = mockMvc.perform(post("/signup")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(signUpForm)))
+                        .content(objectMapper.writeValueAsString(signUpDto)))
                 .andExpect(status().isOk()).andReturn();
         assertThat(result.getResponse().getContentAsString()).isEqualTo(
                         "{\"userid\":\"userid\"," +

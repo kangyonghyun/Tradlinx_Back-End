@@ -1,8 +1,8 @@
 package com.tradlinx.account;
 
 import com.tradlinx.account.form.LoginForm;
-import com.tradlinx.account.form.NewAccountForm;
-import com.tradlinx.account.form.SignUpForm;
+import com.tradlinx.account.form.NewSignUpDto;
+import com.tradlinx.account.form.SignUpDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,8 +15,8 @@ public class AccountController {
     private final AccountService accountService;
 
     @PostMapping("/signup")
-    public NewAccountForm SignUp(@RequestBody SignUpForm signUpForm) {
-        return accountService.processNewAccount(signUpForm);
+    public NewSignUpDto SignUp(@RequestBody SignUpDto signUpDto) {
+        return accountService.processNewAccount(signUpDto);
     }
 
     @PostMapping("/signin")
@@ -27,4 +27,9 @@ public class AccountController {
         }
         return new AccessToken("Authorization: Bearer JwtToken");
     }
+
+//    @GetMapping("/profile")
+//    public ProfileForm viewProfile(AccessToken accessToken) {
+//
+//    }
 }
