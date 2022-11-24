@@ -7,6 +7,7 @@ import javax.persistence.Id;
 
 @Entity
 @Getter @Setter
+@NoArgsConstructor
 public class Account {
 
     @Id
@@ -14,4 +15,8 @@ public class Account {
     String pw;
     String username;
 
+    public Account(String userid, String pw) {
+        this.userid = userid;
+        this.pw = pw;
+    }
 }
