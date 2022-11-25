@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tradlinx.account.form.LoginDto;
 import com.tradlinx.account.form.SignUpDto;
 import org.hamcrest.core.StringStartsWith;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.TestExecutionEvent;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -33,14 +36,19 @@ class AccountControllerTest {
     @Autowired
     AccountService accountService;
 
-    @Test
-    @DisplayName("회원 가입 - 성공")
-    void signUp_correct_input() throws Exception {
-        SignUpDto signUpDto = new SignUpDto();
+    SignUpDto signUpDto;
+    @BeforeEach
+    void beforeEach() {
+        signUpDto = new SignUpDto();
         signUpDto.setUserid("userid");
         signUpDto.setPw("passw0rd");
         signUpDto.setUsername("username");
+        accountService.processNewAccount(signUpDto);
+    }
 
+    @Test
+    @DisplayName("회원 가입 - 성공")
+    void signUp_correct_input() throws Exception {
         mockMvc.perform(post("/signup")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(signUpDto)))
@@ -52,12 +60,6 @@ class AccountControllerTest {
     @Test
     @DisplayName("로그인 - 성공")
     void login_success() throws Exception {
-        SignUpDto signUpDto = new SignUpDto();
-        signUpDto.setUserid("userid");
-        signUpDto.setPw("passw0rd");
-        signUpDto.setUsername("username");
-        accountService.processNewAccount(signUpDto);
-
         LoginDto loginDto = new LoginDto();
         loginDto.setUserid("userid");
         loginDto.setPw("passw0rd");
@@ -70,20 +72,10 @@ class AccountControllerTest {
                 .andDo(print());
     }
 
+    @WithUserDetails(value = "userid", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @Test
     @DisplayName("프로필 조회")
     void get_profile() throws Exception {
-        SignUpDto signUpDto = new SignUpDto();
-        signUpDto.setUserid("userid");
-        signUpDto.setPw("passw0rd");
-        signUpDto.setUsername("username");
-        accountService.processNewAccount(signUpDto);
-
-        LoginDto loginDto = new LoginDto();
-        loginDto.setUserid("userid");
-        loginDto.setPw("passw0rd");
-        accountService.processLogin(loginDto);
-
         mockMvc.perform(get("/profile")
                         .header(HttpHeaders.AUTHORIZATION, new StringStartsWith("Bearer ")))
                 .andExpect(status().isOk())
@@ -91,20 +83,10 @@ class AccountControllerTest {
                 .andExpect(jsonPath("username", is("username")));
     }
 
+    @WithUserDetails(value = "userid", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @Test
     @DisplayName("포인트 조회")
     void get_points() throws Exception {
-        SignUpDto signUpDto = new SignUpDto();
-        signUpDto.setUserid("userid");
-        signUpDto.setPw("passw0rd");
-        signUpDto.setUsername("username");
-        accountService.processNewAccount(signUpDto);
-
-        LoginDto loginDto = new LoginDto();
-        loginDto.setUserid("userid");
-        loginDto.setPw("passw0rd");
-        accountService.processLogin(loginDto);
-
         mockMvc.perform(get("/points")
                         .header(HttpHeaders.AUTHORIZATION, new StringStartsWith("Bearer ")))
                 .andExpect(status().isOk())
