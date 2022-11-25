@@ -12,16 +12,14 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.hamcrest.Matchers.is;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -35,8 +33,6 @@ class AccountControllerTest {
     AccountRepository accountRepository;
     @Autowired
     AccountService accountService;
-    @Autowired
-    JwtTokenProvider tokenProvider;
 
     @Test
     @DisplayName("회원 가입 - 성공")
@@ -69,11 +65,32 @@ class AccountControllerTest {
 
         mockMvc.perform(post("/signin")
                         .content(objectMapper.writeValueAsString(loginDto))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .with(csrf()))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(header().string(HttpHeaders.AUTHORIZATION, new StringStartsWith("Bearer ")))
                 .andDo(print());
+    }
+
+    @Test
+    @DisplayName("프로필 조회")
+    void get_profile() throws Exception {
+        SignUpDto signUpDto = new SignUpDto();
+        signUpDto.setUserid("userid");
+        signUpDto.setPw("passw0rd");
+        signUpDto.setUsername("username");
+        accountService.processNewAccount(signUpDto);
+
+        LoginDto loginDto = new LoginDto();
+        loginDto.setUserid("userid");
+        loginDto.setPw("passw0rd");
+        accountService.processLogin(loginDto);
+
+        mockMvc.perform(get("/profile")
+                        .header(HttpHeaders.AUTHORIZATION, new StringStartsWith("Bearer ")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("userid", is("userid")))
+                .andExpect(jsonPath("username", is("username")))
+                .andExpect(jsonPath("points", is(0)));
     }
 
 }
