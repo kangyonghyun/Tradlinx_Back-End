@@ -11,9 +11,10 @@ import javax.persistence.Id;
 public class Account {
 
     @Id
-    String userid;
-    String pw;
-    String username;
+    private String userid;
+    private String pw;
+    private String username;
+    private int points;
 
     public Account(String userid, String pw) {
         this.userid = userid;
