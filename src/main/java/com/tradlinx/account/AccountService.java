@@ -1,9 +1,6 @@
 package com.tradlinx.account;
 
-import com.tradlinx.account.form.LoginDto;
-import com.tradlinx.account.form.ProfileDto;
-import com.tradlinx.account.form.SignUpDto;
-import com.tradlinx.account.form.UserAccount;
+import com.tradlinx.account.form.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -78,4 +75,11 @@ public class AccountService implements UserDetailsService {
         return Optional.ofNullable(userid);
     }
 
+    public PointsDto getPoints() {
+        return PointsDto.from(
+                getCurrentUserid()
+                        .flatMap(accountRepository::findOneWithByUserid)
+                        .orElseThrow(() -> new IllegalArgumentException("Member not found"))
+        );
+    }
 }

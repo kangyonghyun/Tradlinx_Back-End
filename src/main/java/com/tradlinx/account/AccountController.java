@@ -1,6 +1,7 @@
 package com.tradlinx.account;
 
 import com.tradlinx.account.form.LoginDto;
+import com.tradlinx.account.form.PointsDto;
 import com.tradlinx.account.form.ProfileDto;
 import com.tradlinx.account.form.SignUpDto;
 import com.tradlinx.jwt.JwtFilter;
@@ -45,5 +46,12 @@ public class AccountController {
         ProfileDto profile = accountService.getProfile();
         return new ResponseEntity<>(profile, HttpStatus.OK);
     }
+
+    @GetMapping("/points")
+    public ResponseEntity<PointsDto> points() {
+        PointsDto points = accountService.getPoints();
+        return new ResponseEntity<>(points, HttpStatus.OK);
+    }
+
 
 }
