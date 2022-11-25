@@ -54,8 +54,9 @@ class AccountControllerTest {
                         .content(objectMapper.writeValueAsString(signUpDto)))
                 .andExpect(status().isOk());
 
-        Account newAccount = accountRepository.findById("userid").get();
+        Account newAccount = accountRepository.findById("userid").orElseThrow();
         assertThat(newAccount.getUserid()).isEqualTo("userid");
+        assertThat(newAccount.getPw()).isNotEqualTo("passw0rd");
     }
     @Test
     @DisplayName("로그인 - 성공")
