@@ -9,9 +9,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -34,14 +33,10 @@ class AccountControllerTest {
         signUpDto.setPw("passw0rd");
         signUpDto.setUsername("username");
 
-        MvcResult result = mockMvc.perform(post("/signup")
+        mockMvc.perform(post("/signup")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(signUpDto)))
-                .andExpect(status().isOk()).andReturn();
-        assertThat(result.getResponse().getContentAsString()).isEqualTo(
-                        "{\"userid\":\"userid\"," +
-                        "\"pw\":\"passw0rd\"," +
-                        "\"username\":\"username\"}");
+                .andExpect(status().isOk());
 
         Account newAccount = accountRepository.findById("userid").get();
         assertThat(newAccount.getUserid()).isEqualTo("userid");
