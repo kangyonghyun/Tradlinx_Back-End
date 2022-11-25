@@ -8,7 +8,6 @@ import lombok.Data;
 public class ProfileDto {
     String userid;
     String username;
-    int points;
 
     public static ProfileDto from(Account account) {
         if(account == null) {
@@ -17,7 +16,6 @@ public class ProfileDto {
         return ProfileDto.builder()
                 .userid(account.getUserid())
                 .username(account.getUsername())
-                .points(account.getPoints())
                 .build();
     }
 }
