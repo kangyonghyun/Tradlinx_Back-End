@@ -3,7 +3,6 @@ package com.tradlinx.account;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tradlinx.account.form.LoginDto;
 import com.tradlinx.account.form.SignUpDto;
-import com.tradlinx.jwt.JwtTokenProvider;
 import org.hamcrest.core.StringStartsWith;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -89,7 +88,26 @@ class AccountControllerTest {
                         .header(HttpHeaders.AUTHORIZATION, new StringStartsWith("Bearer ")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("userid", is("userid")))
-                .andExpect(jsonPath("username", is("username")))
+                .andExpect(jsonPath("username", is("username")));
+    }
+
+    @Test
+    @DisplayName("포인트 조회")
+    void get_points() throws Exception {
+        SignUpDto signUpDto = new SignUpDto();
+        signUpDto.setUserid("userid");
+        signUpDto.setPw("passw0rd");
+        signUpDto.setUsername("username");
+        accountService.processNewAccount(signUpDto);
+
+        LoginDto loginDto = new LoginDto();
+        loginDto.setUserid("userid");
+        loginDto.setPw("passw0rd");
+        accountService.processLogin(loginDto);
+
+        mockMvc.perform(get("/points")
+                        .header(HttpHeaders.AUTHORIZATION, new StringStartsWith("Bearer ")))
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("points", is(0)));
     }
 
