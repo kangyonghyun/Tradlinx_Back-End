@@ -6,12 +6,10 @@ import com.tradlinx.account.form.ProfileDto;
 import com.tradlinx.account.form.SignUpDto;
 import com.tradlinx.jwt.JwtFilter;
 import com.tradlinx.jwt.JwtToken;
-import com.tradlinx.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AccountController {
 
     private final AccountService accountService;
-    private final JwtTokenProvider tokenProvider;
+
 
     @PostMapping("/signup")
     public ResponseEntity<String> SignUp(@RequestBody SignUpDto signUpDto) {
@@ -32,8 +30,7 @@ public class AccountController {
 
     @PostMapping("/signin")
     public ResponseEntity<JwtToken> signin(@RequestBody LoginDto loginDto) {
-        Authentication authentication = accountService.processLogin(loginDto);
-        String jwt = tokenProvider.createToken(authentication);
+        String jwt = accountService.processLogin(loginDto);
 
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add(JwtFilter.AUTHORIZATION_HEADER, "Bearer " + jwt);

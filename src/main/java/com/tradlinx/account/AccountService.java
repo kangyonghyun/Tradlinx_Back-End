@@ -1,6 +1,7 @@
 package com.tradlinx.account;
 
 import com.tradlinx.account.form.*;
+import com.tradlinx.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -25,6 +26,7 @@ public class AccountService implements UserDetailsService {
     private final PasswordEncoder passwordEncoder;
     private final ModelMapper modelMapper;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
+    private final JwtTokenProvider tokenProvider;
 
     public String processNewAccount(SignUpDto signUpDto) {
         signUpDto.setPw(passwordEncoder.encode(signUpDto.getPw()));
@@ -32,12 +34,12 @@ public class AccountService implements UserDetailsService {
         return account.getUserid();
     }
 
-    public Authentication processLogin(LoginDto loginDto) {
+    public String processLogin(LoginDto loginDto) {
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(loginDto.getUserid(), loginDto.getPw());
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        return authentication;
+        return tokenProvider.createToken(authentication);
     }
 
     @Override
