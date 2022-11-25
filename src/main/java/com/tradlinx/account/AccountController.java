@@ -1,6 +1,7 @@
 package com.tradlinx.account;
 
 import com.tradlinx.account.form.LoginDto;
+import com.tradlinx.account.form.ProfileDto;
 import com.tradlinx.account.form.SignUpDto;
 import com.tradlinx.jwt.JwtFilter;
 import com.tradlinx.jwt.JwtToken;
@@ -10,6 +11,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -36,6 +38,12 @@ public class AccountController {
         httpHeaders.add(JwtFilter.AUTHORIZATION_HEADER, "Bearer " + jwt);
 
         return new ResponseEntity<>(new JwtToken(jwt), httpHeaders, HttpStatus.OK);
+    }
+
+    @GetMapping("/profile")
+    public ResponseEntity<ProfileDto> profile() {
+        ProfileDto profile = accountService.getProfile();
+        return new ResponseEntity<>(profile, HttpStatus.OK);
     }
 
 }
