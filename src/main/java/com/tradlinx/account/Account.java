@@ -36,4 +36,12 @@ public class Account {
     public void addWriterPoints() {
         this.points += 1;
     }
+
+    public void minusCommentsPoint() {
+        this.points -= 2;
+    }
+
+    public void minusWriterPoints() {
+        this.points -= 1;
+    }
 }
