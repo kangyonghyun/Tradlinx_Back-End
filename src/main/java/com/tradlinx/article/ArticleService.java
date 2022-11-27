@@ -3,12 +3,15 @@ package com.tradlinx.article;
 import com.tradlinx.account.Account;
 import com.tradlinx.account.AccountRepository;
 import com.tradlinx.account.AccountService;
+import com.tradlinx.account.form.ArticleUpdateDto;
 import com.tradlinx.article.form.ArticleDto;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class ArticleService {
 
@@ -26,4 +29,13 @@ public class ArticleService {
         article.setArticleId("articleId");
         return articleRepository.save(article).getArticleId();
     }
+
+    public String updateArticle(ArticleUpdateDto articleUpdateDto) {
+        Article article = articleRepository.findById(articleUpdateDto.getArticleId())
+                .orElseThrow(() -> new IllegalArgumentException("Article not found"));
+        modelMapper.map(articleUpdateDto, article);
+        articleRepository.save(article);
+        return article.getArticleId();
+    }
+
 }
