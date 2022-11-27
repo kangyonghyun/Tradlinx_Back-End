@@ -16,38 +16,38 @@ public class ArticleController {
     private final ArticleService articleService;
 
     @PostMapping("/article")
-    public ResponseEntity<String> write(@RequestBody ArticleDto articleDto) {
+    public ResponseEntity<String> writeArticle(@RequestBody ArticleDto articleDto) {
         String articleId = articleService.writeArticle(articleDto);
         return new ResponseEntity<>(articleId, HttpStatus.OK);
     }
 
     @PutMapping("/article")
-    public ResponseEntity<String> update(@RequestBody ArticleUpdateDto articleUpdateDto) {
+    public ResponseEntity<String> updateArticle(@RequestBody ArticleUpdateDto articleUpdateDto) {
         String articleId = articleService.updateArticle(articleUpdateDto);
         return new ResponseEntity<>(articleId, HttpStatus.OK);
     }
     @DeleteMapping("/article/{articleId}")
-    public ResponseEntity<String> delete(@PathVariable(name = "articleId") String articleId) {
+    public ResponseEntity<String> deleteArticle(@PathVariable(name = "articleId") String articleId) {
         articleService.deleteArticle(articleId);
-        return new ResponseEntity("1", HttpStatus.OK);
+        return new ResponseEntity<>("1", HttpStatus.OK);
     }
 
     @GetMapping("/article/{articleId}")
-    public ResponseEntity<ArticleCommentsDto> article(@PathVariable(name = "articleId") String articleId) {
+    public ResponseEntity<ArticleCommentsDto> getArticle(@PathVariable(name = "articleId") String articleId) {
         ArticleCommentsDto commentsId = articleService.getCommentsOfArticle(articleId);
-        return new ResponseEntity(commentsId, HttpStatus.OK);
+        return new ResponseEntity<>(commentsId, HttpStatus.OK);
     }
 
     @PostMapping("/comments")
     public ResponseEntity<String> writeComment(@RequestBody CommentDto commentDto) {
        String commentId = articleService.writeComment(commentDto);
-        return new ResponseEntity(commentId, HttpStatus.OK);
+        return new ResponseEntity<>(commentId, HttpStatus.OK);
     }
 
     @DeleteMapping("/comments/{commentId}")
     public ResponseEntity<String> deleteComment(@PathVariable("commentId") String commentId) {
         String comment = articleService.deleteComment(commentId);
-        return new ResponseEntity(comment, HttpStatus.OK);
+        return new ResponseEntity<>(comment, HttpStatus.OK);
     }
 
 }
