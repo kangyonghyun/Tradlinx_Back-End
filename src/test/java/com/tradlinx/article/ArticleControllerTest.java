@@ -4,9 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tradlinx.account.Account;
 import com.tradlinx.account.AccountRepository;
 import com.tradlinx.account.AccountService;
-import com.tradlinx.account.form.ArticleUpdateDto;
+import com.tradlinx.account.form.LoginDto;
+import com.tradlinx.article.form.ArticleUpdateDto;
 import com.tradlinx.account.form.SignUpDto;
 import com.tradlinx.article.form.ArticleDto;
+import com.tradlinx.article.form.CommentDto;
 import org.hamcrest.core.StringStartsWith;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,11 +24,13 @@ import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.is;
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.authenticated;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -115,7 +119,7 @@ class ArticleControllerTest {
 
     @WithUserDetails(value = "userid", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @Test
-    @DisplayName("글 삭제 - 포인트 감소 3")
+    @DisplayName("글 삭제 - 포인트 감소 -3")
     void article_delete_success() throws Exception {
         ArticleDto articleDto = new ArticleDto();
         articleDto.setArticleTitle("articleTitle");
@@ -133,6 +137,65 @@ class ArticleControllerTest {
 
         assertThat(articleRepository.findById("articleId")).isEmpty();
         assertThat(account.getPoints()).isEqualTo(0);
+    }
+
+    @WithUserDetails(value = "userid", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @Test
+    @DisplayName("글 조회 - commentId 응답")
+    void article_get_success() throws Exception {
+        ArticleDto articleDto = new ArticleDto();
+        articleDto.setArticleTitle("articleTitle");
+        articleDto.setArticleContents("articleContents");
+        articleService.writeArticle(articleDto);
+
+        mockMvc.perform(get("/article/articleId")
+                        .header(HttpHeaders.AUTHORIZATION, new StringStartsWith("Bearer ")))
+                .andExpect(status().isOk())
+                .andExpect(authenticated())
+                .andExpect(jsonPath("articleId", is("articleId")))
+                .andExpect(jsonPath("commentsId", is(new ArrayList())));
+    }
+
+    @WithUserDetails(value = "userid", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @Test
+    @DisplayName("댓글 작성 - commentId 응답, 댓글 작성자 points +2, 원글 작성자 points +1")
+    void comment_write_success() throws Exception {
+        ArticleDto articleDto = new ArticleDto();
+        articleDto.setArticleTitle("articleTitle");
+        articleDto.setArticleContents("articleContents");
+        articleService.writeArticle(articleDto);
+
+        anotherAccountAndLogin();
+
+        CommentDto commentDto = new CommentDto();
+        commentDto.setArticleId("articleId");
+        commentDto.setCommentContents("commentsContents");
+
+        mockMvc.perform(post("/comments")
+                        .header(HttpHeaders.AUTHORIZATION, new StringStartsWith("Bearer "))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(commentDto)))
+                .andExpect(status().isOk())
+                .andExpect(authenticated())
+                .andExpect(content().string("commentId"));
+
+        Article article = articleRepository.findById("articleId").orElseThrow();
+        assertThat(article.getAccount().getPoints()).isEqualTo(4);
+
+        Account account = accountRepository.findById("userid2").orElseThrow();
+        assertThat(account.getPoints()).isEqualTo(2);
+    }
+
+    private void anotherAccountAndLogin() {
+        SignUpDto signUpDto1 = new SignUpDto();
+        signUpDto1.setUserid("userid2");
+        signUpDto1.setPw("passw0rd");
+        signUpDto1.setUsername("username");
+        accountService.processNewAccount(signUpDto1);
+        LoginDto loginDto = new LoginDto();
+        loginDto.setUserid("userid2");
+        loginDto.setPw("passw0rd");
+        accountService.processLogin(loginDto);
     }
 
 }
