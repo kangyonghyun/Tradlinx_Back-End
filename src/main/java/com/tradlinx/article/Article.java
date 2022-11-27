@@ -30,6 +30,13 @@ public class Article {
 
     public void setAccount(Account account) {
         this.account = account;
+        account.getArticles().add(this);
+        account.addArticlePoints();
+    }
+
+    public void removeArticle(Article article) {
+        this.account.getArticles().remove(article);
+        this.account.minusArticlePoints();
     }
 
 }
