@@ -1,23 +1,27 @@
 package com.tradlinx.account;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
 @Entity
 @Getter @Setter
-@NoArgsConstructor
+@AllArgsConstructor @NoArgsConstructor
 public class Account {
 
     @Id
+    @Column(name = "user_id")
     private String userid;
     private String pw;
     private String username;
     private int points;
 
-    public Account(String userid, String pw) {
-        this.userid = userid;
-        this.pw = pw;
+    public void addPoints() {
+        this.points += 3;
     }
 }
