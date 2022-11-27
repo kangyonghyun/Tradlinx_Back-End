@@ -1,4 +1,4 @@
-package com.tradlinx.account.form;
+package com.tradlinx.article.form;
 
 import lombok.Data;
 
