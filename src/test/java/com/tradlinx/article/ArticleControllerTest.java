@@ -1,6 +1,5 @@
 package com.tradlinx.article;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tradlinx.account.Account;
 import com.tradlinx.account.AccountRepository;
@@ -8,7 +7,6 @@ import com.tradlinx.account.AccountService;
 import com.tradlinx.account.form.ArticleUpdateDto;
 import com.tradlinx.account.form.SignUpDto;
 import com.tradlinx.article.form.ArticleDto;
-import org.assertj.core.api.Assertions;
 import org.hamcrest.core.StringStartsWith;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,13 +22,11 @@ import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.authenticated;
-import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.unauthenticated;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -115,6 +111,28 @@ class ArticleControllerTest {
         Article article = articleRepository.findById("articleId").orElseThrow();
         assertThat(article.getArticleTitle()).isEqualTo("updateArticleTitle");
         assertThat(article.getArticleContents()).isEqualTo("updateArticleContents");
+    }
+
+    @WithUserDetails(value = "userid", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @Test
+    @DisplayName("글 삭제 - 포인트 감소 3")
+    void article_delete_success() throws Exception {
+        ArticleDto articleDto = new ArticleDto();
+        articleDto.setArticleTitle("articleTitle");
+        articleDto.setArticleContents("articleContents");
+        articleService.writeArticle(articleDto);
+
+        Account account = accountRepository.findById("userid").orElseThrow();
+        assertThat(account.getPoints()).isEqualTo(3);
+
+        mockMvc.perform(delete("/article/articleId")
+                        .header(HttpHeaders.AUTHORIZATION, new StringStartsWith("Bearer ")))
+                .andExpect(status().isOk())
+                .andExpect(authenticated())
+                .andExpect(content().string("1"));
+
+        assertThat(articleRepository.findById("articleId")).isEmpty();
+        assertThat(account.getPoints()).isEqualTo(0);
     }
 
 }
