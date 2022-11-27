@@ -35,4 +35,9 @@ public class Comment {
         this.article.getAccount().addWriterPoints();
         account.addCommentPoints();
     }
+
+    public void removePoint(Account account) {
+        this.article.getAccount().minusWriterPoints();
+        account.minusCommentsPoint();
+    }
 }

@@ -86,4 +86,17 @@ public class ArticleService {
         comment.addPoints(account);
         return commentRepository.save(comment).getCommentId();
     }
+
+    public String deleteComment(String commentId) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new IllegalArgumentException("Comment not found"));
+
+        Account account = AccountService.getCurrentUserid()
+                .flatMap(accountRepository::findOneWithByUserid)
+                .orElseThrow(() -> new IllegalArgumentException("Member not found"));
+        comment.removePoint(account);
+
+        commentRepository.delete(comment);
+        return comment.getCommentId();
+    }
 }

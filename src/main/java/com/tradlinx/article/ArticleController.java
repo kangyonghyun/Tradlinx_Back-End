@@ -39,9 +39,15 @@ public class ArticleController {
     }
 
     @PostMapping("/comments")
-    public ResponseEntity<String> comment(@RequestBody CommentDto commentDto) {
+    public ResponseEntity<String> writeComment(@RequestBody CommentDto commentDto) {
        String commentId = articleService.writeComment(commentDto);
         return new ResponseEntity(commentId, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/comments/{commentId}")
+    public ResponseEntity<String> deleteComment(@PathVariable("commentId") String commentId) {
+        String comment = articleService.deleteComment(commentId);
+        return new ResponseEntity(comment, HttpStatus.OK);
     }
 
 }
