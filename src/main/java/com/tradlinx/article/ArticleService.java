@@ -6,6 +6,9 @@ import com.tradlinx.account.AccountService;
 import com.tradlinx.article.form.ArticleCommentsDto;
 import com.tradlinx.article.form.ArticleUpdateDto;
 import com.tradlinx.article.form.ArticleDto;
+import com.tradlinx.article.form.CommentDto;
+import com.tradlinx.comment.Comment;
+import com.tradlinx.comment.CommentRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -22,6 +25,7 @@ public class ArticleService {
     private final ModelMapper modelMapper;
     private final ArticleRepository articleRepository;
     private final AccountRepository accountRepository;
+    private final CommentRepository commentRepository;
 
     public String writeArticle(ArticleDto articleDto) {
         Account account = AccountService.getCurrentUserid()
@@ -31,6 +35,7 @@ public class ArticleService {
 
         Article article = modelMapper.map(articleDto, Article.class);
         article.setArticleId("articleId");
+        article.setAccount(account);
         return articleRepository.save(article).getArticleId();
     }
 
@@ -57,6 +62,7 @@ public class ArticleService {
     public ArticleCommentsDto getCommentsOfArticle(String articleId) {
         Article article = articleRepository.findById(articleId)
                 .orElseThrow(() -> new IllegalArgumentException("Article not found"));
+
         List<String> allComments = article.getComments().stream()
                 .map(Comment::getCommentId).collect(Collectors.toList());
 
@@ -64,5 +70,20 @@ public class ArticleService {
         articleCommentsDto.setArticleId(articleId);
         articleCommentsDto.setCommentsId(allComments);
         return articleCommentsDto;
+    }
+
+    public String writeComment(CommentDto commentDto) {
+        Article article = articleRepository.findById(commentDto.getArticleId())
+                .orElseThrow(() -> new IllegalArgumentException("Article not found"));
+
+        Account account = AccountService.getCurrentUserid()
+                .flatMap(accountRepository::findOneWithByUserid)
+                .orElseThrow(() -> new IllegalArgumentException("Member not found"));
+
+        Comment comment = modelMapper.map(commentDto, Comment.class);
+        comment.setCommentId("commentId");
+        comment.setArticle(article);
+        comment.addPoints(account);
+        return commentRepository.save(comment).getCommentId();
     }
 }

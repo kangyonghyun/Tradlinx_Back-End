@@ -24,4 +24,16 @@ public class Account {
     public void addPoints() {
         this.points += 3;
     }
+
+    public void minusPoints() {
+        this.points -= 3;
+    }
+
+    public void addCommentPoints() {
+        this.points += 2;
+    }
+
+    public void addWriterPoints() {
+        this.points += 1;
+    }
 }

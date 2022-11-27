@@ -3,6 +3,7 @@ package com.tradlinx.article;
 import com.tradlinx.article.form.ArticleCommentsDto;
 import com.tradlinx.article.form.ArticleDto;
 import com.tradlinx.article.form.ArticleUpdateDto;
+import com.tradlinx.article.form.CommentDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,6 +36,12 @@ public class ArticleController {
     public ResponseEntity<ArticleCommentsDto> article(@PathVariable(name = "articleId") String articleId) {
         ArticleCommentsDto commentsId = articleService.getCommentsOfArticle(articleId);
         return new ResponseEntity(commentsId, HttpStatus.OK);
+    }
+
+    @PostMapping("/comments")
+    public ResponseEntity<String> comment(@RequestBody CommentDto commentDto) {
+       String commentId = articleService.writeComment(commentDto);
+        return new ResponseEntity(commentId, HttpStatus.OK);
     }
 
 }
