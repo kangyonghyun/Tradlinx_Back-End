@@ -4,9 +4,9 @@ import com.tradlinx.account.Account;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Getter @Setter
@@ -22,5 +22,8 @@ public class Article {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     Account account;
+
+    @OneToMany(mappedBy = "article")
+    List<Comment> comments;
 
 }

@@ -3,12 +3,16 @@ package com.tradlinx.article;
 import com.tradlinx.account.Account;
 import com.tradlinx.account.AccountRepository;
 import com.tradlinx.account.AccountService;
-import com.tradlinx.account.form.ArticleUpdateDto;
+import com.tradlinx.article.form.ArticleCommentsDto;
+import com.tradlinx.article.form.ArticleUpdateDto;
 import com.tradlinx.article.form.ArticleDto;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -49,4 +53,16 @@ public class ArticleService {
         account.minusPoints();
     }
 
+
+    public ArticleCommentsDto getCommentsOfArticle(String articleId) {
+        Article article = articleRepository.findById(articleId)
+                .orElseThrow(() -> new IllegalArgumentException("Article not found"));
+        List<String> allComments = article.getComments().stream()
+                .map(Comment::getCommentId).collect(Collectors.toList());
+
+        ArticleCommentsDto articleCommentsDto = new ArticleCommentsDto();
+        articleCommentsDto.setArticleId(articleId);
+        articleCommentsDto.setCommentsId(allComments);
+        return articleCommentsDto;
+    }
 }
