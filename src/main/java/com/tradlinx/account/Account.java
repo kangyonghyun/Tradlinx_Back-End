@@ -1,5 +1,6 @@
 package com.tradlinx.account;
 
+import com.tradlinx.article.Article;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,11 +9,18 @@ import lombok.Setter;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter @Setter
 @AllArgsConstructor @NoArgsConstructor
 public class Account {
+
+    public static final int WRITE_ARTICLE_POINTS = 3;
+    public static final int WRITE_COMMENT_POINT = 2;
+    public static final int WRITE_WRITER_COMMENT_POINT = 1;
 
     @Id
     @Column(name = "user_id")
@@ -20,28 +28,31 @@ public class Account {
     private String pw;
     private String username;
     private int points;
+    @OneToMany(mappedBy = "account")
+    List<Article> articles = new ArrayList<>();
 
-    public void addPoints() {
-        this.points += 3;
+    public void addArticlePoints() {
+        this.points += WRITE_ARTICLE_POINTS;
     }
 
-    public void minusPoints() {
-        this.points -= 3;
+    public void minusArticlePoints() {
+        this.points -= WRITE_ARTICLE_POINTS;
     }
 
     public void addCommentPoints() {
-        this.points += 2;
-    }
-
-    public void addWriterPoints() {
-        this.points += 1;
+        this.points += WRITE_COMMENT_POINT;
     }
 
     public void minusCommentsPoint() {
-        this.points -= 2;
+        this.points -= WRITE_COMMENT_POINT;
+    }
+
+    public void addWriterPoints() {
+        this.points += WRITE_WRITER_COMMENT_POINT;
     }
 
     public void minusWriterPoints() {
-        this.points -= 1;
+        this.points -= WRITE_WRITER_COMMENT_POINT;
     }
+
 }
