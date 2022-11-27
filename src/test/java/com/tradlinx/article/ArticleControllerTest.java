@@ -198,4 +198,33 @@ class ArticleControllerTest {
         accountService.processLogin(loginDto);
     }
 
+    @WithUserDetails(value = "userid", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @Test
+    @DisplayName("댓글 삭제 - commentId 응답, 댓글 작성자 points -2, 원글 작성자 points -1")
+    void comment_delete_success() throws Exception {
+        ArticleDto articleDto = new ArticleDto();
+        articleDto.setArticleTitle("articleTitle");
+        articleDto.setArticleContents("articleContents");
+        articleService.writeArticle(articleDto);
+
+        anotherAccountAndLogin();
+
+        CommentDto commentDto = new CommentDto();
+        commentDto.setArticleId("articleId");
+        commentDto.setCommentContents("commentsContents");
+        articleService.writeComment(commentDto);
+
+        mockMvc.perform(delete("/comments/commentId")
+                        .header(HttpHeaders.AUTHORIZATION, new StringStartsWith("Bearer ")))
+                .andExpect(status().isOk())
+                .andExpect(authenticated())
+                .andExpect(content().string("commentId"));
+
+        Article article = articleRepository.findById("articleId").orElseThrow();
+        assertThat(article.getAccount().getPoints()).isEqualTo(3);
+
+        Account account = accountRepository.findById("userid2").orElseThrow();
+        assertThat(account.getPoints()).isEqualTo(0);
+    }
+
 }
