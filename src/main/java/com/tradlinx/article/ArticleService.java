@@ -38,4 +38,15 @@ public class ArticleService {
         return article.getArticleId();
     }
 
+    public void deleteArticle(String articleId) {
+        Article article = articleRepository.findById(articleId)
+                .orElseThrow(() -> new IllegalArgumentException("Article not found"));
+        articleRepository.delete(article);
+
+        Account account = AccountService.getCurrentUserid()
+                .flatMap(accountRepository::findOneWithByUserid)
+                .orElseThrow(() -> new IllegalArgumentException("Member not found"));
+        account.minusPoints();
+    }
+
 }

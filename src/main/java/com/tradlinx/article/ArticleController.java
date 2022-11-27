@@ -5,10 +5,7 @@ import com.tradlinx.article.form.ArticleDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -26,6 +23,11 @@ public class ArticleController {
     public ResponseEntity<String> update(@RequestBody ArticleUpdateDto articleUpdateDto) {
         String articleId = articleService.updateArticle(articleUpdateDto);
         return new ResponseEntity<>(articleId, HttpStatus.OK);
+    }
+    @DeleteMapping(value = "/article/{articleId}", produces = "application/json")
+    public ResponseEntity<String> delete(@PathVariable(name = "articleId") String articleId) {
+        articleService.deleteArticle(articleId);
+        return new ResponseEntity("1", HttpStatus.OK);
     }
 
 }
