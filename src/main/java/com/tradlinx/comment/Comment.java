@@ -31,12 +31,13 @@ public class Comment {
         article.getComments().add(this);
     }
 
-    public void addPoints(Account account) {
+    public void setAccount(Account account) {
         this.article.getAccount().addWriterPoints();
         account.addCommentPoints();
     }
 
-    public void removePoint(Account account) {
+    public void removeArticle(Account account) {
+        this.article.getComments().remove(article);
         this.article.getAccount().minusWriterPoints();
         account.minusCommentsPoint();
     }
