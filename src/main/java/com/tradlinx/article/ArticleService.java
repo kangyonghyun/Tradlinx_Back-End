@@ -30,8 +30,7 @@ public class ArticleService {
     public String writeArticle(ArticleDto articleDto) {
         Account account = AccountService.getCurrentUserid()
                 .flatMap(accountRepository::findOneWithByUserid)
-                .orElseThrow(() -> new IllegalArgumentException("Member not found"));
-        account.addPoints();
+                .orElseThrow(() -> new IllegalArgumentException("Account not found"));
 
         Article article = modelMapper.map(articleDto, Article.class);
         article.setArticleId("articleId");
@@ -43,19 +42,14 @@ public class ArticleService {
         Article article = articleRepository.findById(articleUpdateDto.getArticleId())
                 .orElseThrow(() -> new IllegalArgumentException("Article not found"));
         modelMapper.map(articleUpdateDto, article);
-        articleRepository.save(article);
         return article.getArticleId();
     }
 
     public void deleteArticle(String articleId) {
         Article article = articleRepository.findById(articleId)
                 .orElseThrow(() -> new IllegalArgumentException("Article not found"));
+        article.removeArticle(article);
         articleRepository.delete(article);
-
-        Account account = AccountService.getCurrentUserid()
-                .flatMap(accountRepository::findOneWithByUserid)
-                .orElseThrow(() -> new IllegalArgumentException("Member not found"));
-        account.minusPoints();
     }
 
 
@@ -78,12 +72,12 @@ public class ArticleService {
 
         Account account = AccountService.getCurrentUserid()
                 .flatMap(accountRepository::findOneWithByUserid)
-                .orElseThrow(() -> new IllegalArgumentException("Member not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Account not found"));
 
         Comment comment = modelMapper.map(commentDto, Comment.class);
         comment.setCommentId("commentId");
         comment.setArticle(article);
-        comment.addPoints(account);
+        comment.setAccount(account);
         return commentRepository.save(comment).getCommentId();
     }
 
@@ -93,9 +87,8 @@ public class ArticleService {
 
         Account account = AccountService.getCurrentUserid()
                 .flatMap(accountRepository::findOneWithByUserid)
-                .orElseThrow(() -> new IllegalArgumentException("Member not found"));
-        comment.removePoint(account);
-
+                .orElseThrow(() -> new IllegalArgumentException("Account not found"));
+        comment.removeArticle(account);
         commentRepository.delete(comment);
         return comment.getCommentId();
     }
