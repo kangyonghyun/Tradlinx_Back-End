@@ -61,3 +61,4 @@
    - https://github.com/kangyonghyun/Tradlinx_Back-End
 6. 서술형 URL
    - https://kangyonghyun.notion.site/TradLinx-1f14b544826641479357a5f93cf64cf0
+   - 
