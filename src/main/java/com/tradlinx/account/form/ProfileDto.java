@@ -6,8 +6,8 @@ import lombok.Data;
 
 @Data @Builder
 public class ProfileDto {
-    String userid;
-    String username;
+    private String userid;
+    private String username;
 
     public static ProfileDto from(Account account) {
         if(account == null) {
