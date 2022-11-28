@@ -1,9 +1,6 @@
 package com.tradlinx.article;
 
-import com.tradlinx.article.form.ArticleCommentsDto;
-import com.tradlinx.article.form.ArticleDto;
-import com.tradlinx.article.form.ArticleUpdateDto;
-import com.tradlinx.article.form.CommentDto;
+import com.tradlinx.article.form.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,20 +13,20 @@ public class ArticleController {
     private final ArticleService articleService;
 
     @PostMapping("/article")
-    public ResponseEntity<String> writeArticle(@RequestBody ArticleDto articleDto) {
+    public ResponseEntity<NewArticleDto> writeArticle(@RequestBody ArticleDto articleDto) {
         String articleId = articleService.writeArticle(articleDto);
-        return new ResponseEntity<>(articleId, HttpStatus.OK);
+        return new ResponseEntity<>(new NewArticleDto(articleId), HttpStatus.OK);
     }
 
     @PutMapping("/article")
-    public ResponseEntity<String> updateArticle(@RequestBody ArticleUpdateDto articleUpdateDto) {
+    public ResponseEntity<NewArticleDto> updateArticle(@RequestBody ArticleUpdateDto articleUpdateDto) {
         String articleId = articleService.updateArticle(articleUpdateDto);
-        return new ResponseEntity<>(articleId, HttpStatus.OK);
+        return new ResponseEntity<>(new NewArticleDto(articleId), HttpStatus.OK);
     }
     @DeleteMapping("/article/{articleId}")
-    public ResponseEntity<String> deleteArticle(@PathVariable(name = "articleId") String articleId) {
+    public ResponseEntity<DeleteArticleDto> deleteArticle(@PathVariable(name = "articleId") String articleId) {
         articleService.deleteArticle(articleId);
-        return new ResponseEntity<>("1", HttpStatus.OK);
+        return new ResponseEntity<>(new DeleteArticleDto(), HttpStatus.OK);
     }
 
     @GetMapping("/article/{articleId}")
@@ -39,15 +36,15 @@ public class ArticleController {
     }
 
     @PostMapping("/comments")
-    public ResponseEntity<String> writeComment(@RequestBody CommentDto commentDto) {
+    public ResponseEntity<NewCommentDto> writeComment(@RequestBody CommentDto commentDto) {
        String commentId = articleService.writeComment(commentDto);
-        return new ResponseEntity<>(commentId, HttpStatus.OK);
+        return new ResponseEntity<>(new NewCommentDto(commentId), HttpStatus.OK);
     }
 
     @DeleteMapping("/comments/{commentId}")
-    public ResponseEntity<String> deleteComment(@PathVariable("commentId") String commentId) {
+    public ResponseEntity<NewCommentDto> deleteComment(@PathVariable("commentId") String commentId) {
         String comment = articleService.deleteComment(commentId);
-        return new ResponseEntity<>(comment, HttpStatus.OK);
+        return new ResponseEntity<>(new NewCommentDto(comment), HttpStatus.OK);
     }
 
 }
