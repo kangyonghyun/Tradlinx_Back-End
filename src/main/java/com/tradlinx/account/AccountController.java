@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AccountController {
 
     private final AccountService accountService;
+    private final AccountRepository accountRepository;
 
     @PostMapping("/signup")
     public ResponseEntity<NewSignUpDto> SignUp(@RequestBody SignUpDto signUpDto) {
@@ -26,11 +27,12 @@ public class AccountController {
 
     @PostMapping("/signin")
     public ResponseEntity<JwtToken> signin(@RequestBody LoginDto loginDto) {
-        String jwt = accountService.processLogin(loginDto);
+        accountRepository.findById(loginDto.getUserid())
+                .orElseThrow(() -> new IllegalArgumentException("가입되지 않은 ID 입니다"));
 
+        String jwt = accountService.processLogin(loginDto);
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add(JwtFilter.AUTHORIZATION_HEADER, "Bearer " + jwt);
-
         return new ResponseEntity<>(new JwtToken(jwt), httpHeaders, HttpStatus.OK);
     }
 
