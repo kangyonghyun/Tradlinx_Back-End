@@ -57,8 +57,5 @@
 4. API 테스트
    - Junit5 와 Mockito 테스트 프레임워크를 활용하여 각 API 구현시 단위 테스트
    - 성공 사례 테스트 작성, 실패 사례 테스트 작성이 미흡(보안 필요)
-5. GitHub URL
-   - https://github.com/kangyonghyun/Tradlinx_Back-End
-6. 서술형 URL
+5. 서술형 URL
    - https://kangyonghyun.notion.site/TradLinx-1f14b544826641479357a5f93cf64cf0
-   - 
