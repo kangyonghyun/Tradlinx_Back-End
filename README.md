@@ -55,8 +55,8 @@
      - 댓글 id 를 파라미터로 받아서 해당하는 댓글 삭제, 댓글 id 리턴
      - 해당하는 points 제거
 4. API 테스트
-   - Junit5 와 Mockito 테스트 프레임워크를 활용하여 각 API 구현시 단위 테스르
-   - 성공 사례 테스트 작성, 실패 사례 테스트 작성이 미흡(보안해야함)
+   - Junit5 와 Mockito 테스트 프레임워크를 활용하여 각 API 구현시 단위 테스트
+   - 성공 사례 테스트 작성, 실패 사례 테스트 작성이 미흡(보안 필요)
 5. GitHub URL
    - https://github.com/kangyonghyun/Tradlinx_Back-End
 6. 서술형 URL
