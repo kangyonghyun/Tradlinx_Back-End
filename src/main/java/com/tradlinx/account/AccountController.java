@@ -1,9 +1,6 @@
 package com.tradlinx.account;
 
-import com.tradlinx.account.form.LoginDto;
-import com.tradlinx.account.form.PointsDto;
-import com.tradlinx.account.form.ProfileDto;
-import com.tradlinx.account.form.SignUpDto;
+import com.tradlinx.account.form.*;
 import com.tradlinx.jwt.JwtFilter;
 import com.tradlinx.jwt.JwtToken;
 import lombok.RequiredArgsConstructor;
@@ -21,11 +18,10 @@ public class AccountController {
 
     private final AccountService accountService;
 
-
     @PostMapping("/signup")
-    public ResponseEntity<String> SignUp(@RequestBody SignUpDto signUpDto) {
+    public ResponseEntity<NewSignUpDto> SignUp(@RequestBody SignUpDto signUpDto) {
         String userid = accountService.processNewAccount(signUpDto);
-        return new ResponseEntity<>(userid + "님 가입 완료했습니다.", HttpStatus.OK);
+        return new ResponseEntity<>(new NewSignUpDto(userid), HttpStatus.OK);
     }
 
     @PostMapping("/signin")
