@@ -1,14 +1,17 @@
-package com.tradlinx.article;
+package com.tradlinx.api.article;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.tradlinx.account.Account;
-import com.tradlinx.account.AccountRepository;
-import com.tradlinx.account.AccountService;
-import com.tradlinx.account.form.LoginDto;
-import com.tradlinx.article.form.ArticleUpdateDto;
-import com.tradlinx.account.form.SignUpDto;
-import com.tradlinx.article.form.ArticleDto;
-import com.tradlinx.article.form.CommentDto;
+import com.tradlinx.api.account.Account;
+import com.tradlinx.api.account.AccountRepository;
+import com.tradlinx.api.account.AccountService;
+import com.tradlinx.api.account.form.LoginDto;
+import com.tradlinx.api.article.Article;
+import com.tradlinx.api.article.ArticleRepository;
+import com.tradlinx.api.article.ArticleService;
+import com.tradlinx.api.article.form.ArticleUpdateDto;
+import com.tradlinx.api.account.form.SignUpDto;
+import com.tradlinx.api.article.form.ArticleDto;
+import com.tradlinx.api.article.form.CommentDto;
 import org.hamcrest.core.StringStartsWith;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
