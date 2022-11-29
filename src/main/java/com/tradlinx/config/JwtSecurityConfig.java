@@ -1,7 +1,7 @@
 package com.tradlinx.config;
 
-import com.tradlinx.jwt.JwtFilter;
-import com.tradlinx.jwt.JwtTokenProvider;
+import com.tradlinx.api.jwt.JwtFilter;
+import com.tradlinx.api.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.SecurityConfigurerAdapter;
