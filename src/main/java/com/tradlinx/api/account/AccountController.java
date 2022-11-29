@@ -1,5 +1,6 @@
 package com.tradlinx.api.account;
 
+import com.tradlinx.api.account.exception.SignUpException;
 import com.tradlinx.api.account.form.*;
 import com.tradlinx.api.jwt.JwtFilter;
 import com.tradlinx.api.jwt.JwtToken;
@@ -14,6 +15,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+
 @RestController
 @RequiredArgsConstructor
 @Api(tags = {"Account API"})
@@ -24,9 +27,12 @@ public class AccountController {
 
     @ApiOperation(value = "회원 가입", notes = "회원 가입 API")
     @PostMapping("/signup")
-    public ResponseEntity<NewSignUpDto> SignUp(@RequestBody SignUpDto signUpDto) {
+    public NewSignUpDto SignUp(@RequestBody @Valid SignUpDto signUpDto) {
+        if (accountRepository.existsById(signUpDto.getUserid())) {
+            throw new SignUpException();
+        }
         String userid = accountService.processNewAccount(signUpDto);
-        return new ResponseEntity<>(new NewSignUpDto(userid), HttpStatus.OK);
+        return new NewSignUpDto(userid);
     }
 
     @ApiOperation(value = "로그인", notes = "로그인 API")
