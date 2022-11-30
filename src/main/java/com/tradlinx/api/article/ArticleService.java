@@ -29,7 +29,7 @@ public class ArticleService {
 
     public String writeArticle(ArticleDto articleDto) {
         Account account = AccountService.getCurrentUserid()
-                .flatMap(accountRepository::findOneWithByUserid)
+                .flatMap(accountRepository::findOneWithByUserId)
                 .orElseThrow(() -> new IllegalArgumentException("Account not found"));
 
         Article article = modelMapper.map(articleDto, Article.class);
@@ -71,7 +71,7 @@ public class ArticleService {
                 .orElseThrow(() -> new IllegalArgumentException("Article not found"));
 
         Account account = AccountService.getCurrentUserid()
-                .flatMap(accountRepository::findOneWithByUserid)
+                .flatMap(accountRepository::findOneWithByUserId)
                 .orElseThrow(() -> new IllegalArgumentException("Account not found"));
 
         Comment comment = modelMapper.map(commentDto, Comment.class);
@@ -86,7 +86,7 @@ public class ArticleService {
                 .orElseThrow(() -> new IllegalArgumentException("Comment not found"));
 
         Account account = AccountService.getCurrentUserid()
-                .flatMap(accountRepository::findOneWithByUserid)
+                .flatMap(accountRepository::findOneWithByUserId)
                 .orElseThrow(() -> new IllegalArgumentException("Account not found"));
         comment.removeArticle(account);
         commentRepository.delete(comment);

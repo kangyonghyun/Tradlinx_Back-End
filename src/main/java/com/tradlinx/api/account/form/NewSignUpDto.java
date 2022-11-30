@@ -7,6 +7,6 @@ import lombok.Data;
 @AllArgsConstructor
 public class NewSignUpDto {
 
-    private String userid;
+    private String userId;
 
 }

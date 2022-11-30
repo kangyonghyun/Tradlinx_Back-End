@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Data @Builder
 public class ProfileDto {
-    private String userid;
+    private String userId;
     private String username;
 
     public static ProfileDto from(Account account) {
@@ -14,7 +14,7 @@ public class ProfileDto {
             return null;
         }
         return ProfileDto.builder()
-                .userid(account.getUserid())
+                .userId(account.getUserId())
                 .username(account.getUsername())
                 .build();
     }

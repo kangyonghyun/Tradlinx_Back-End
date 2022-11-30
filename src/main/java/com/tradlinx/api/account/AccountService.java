@@ -32,12 +32,12 @@ public class AccountService implements UserDetailsService {
     public String processNewAccount(SignUpDto signUpDto) {
         signUpDto.setPw(passwordEncoder.encode(signUpDto.getPw()));
         Account account = accountRepository.save(modelMapper.map(signUpDto, Account.class));
-        return account.getUserid();
+        return account.getUserId();
     }
 
     public String processLogin(LoginDto loginDto) {
         UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(loginDto.getUserid(), loginDto.getPw());
+                new UsernamePasswordAuthenticationToken(loginDto.getUserId(), loginDto.getPw());
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
         SecurityContextHolder.getContext().setAuthentication(authentication);
         return tokenProvider.createToken(authentication);
@@ -46,7 +46,7 @@ public class AccountService implements UserDetailsService {
     public ProfileDto getProfile() {
         return ProfileDto.from(
                 getCurrentUserid()
-                        .flatMap(accountRepository::findOneWithByUserid)
+                        .flatMap(accountRepository::findOneWithByUserId)
                         .orElseThrow(() -> new IllegalArgumentException("Member not found"))
         );
     }
@@ -71,7 +71,7 @@ public class AccountService implements UserDetailsService {
     public PointsDto getPoints() {
         return PointsDto.from(
                 getCurrentUserid()
-                        .flatMap(accountRepository::findOneWithByUserid)
+                        .flatMap(accountRepository::findOneWithByUserId)
                         .orElseThrow(() -> new IllegalArgumentException("Member not found"))
         );
     }
@@ -79,7 +79,7 @@ public class AccountService implements UserDetailsService {
     @Transactional
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Account findAccount = accountRepository.findById(username)
+        Account findAccount = accountRepository.findByUserId(username)
                 .orElseThrow(() -> new IllegalArgumentException("가입되지 않은 ID 입니다"));
         return new UserAccount(findAccount);
     }
