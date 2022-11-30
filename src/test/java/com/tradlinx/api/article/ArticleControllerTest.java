@@ -5,9 +5,6 @@ import com.tradlinx.api.account.Account;
 import com.tradlinx.api.account.AccountRepository;
 import com.tradlinx.api.account.AccountService;
 import com.tradlinx.api.account.form.LoginDto;
-import com.tradlinx.api.article.Article;
-import com.tradlinx.api.article.ArticleRepository;
-import com.tradlinx.api.article.ArticleService;
 import com.tradlinx.api.article.form.ArticleUpdateDto;
 import com.tradlinx.api.account.form.SignUpDto;
 import com.tradlinx.api.article.form.ArticleDto;
@@ -59,7 +56,7 @@ class ArticleControllerTest {
     @BeforeEach
     void beforeEach() {
         signUpDto = new SignUpDto();
-        signUpDto.setUserid("userid");
+        signUpDto.setUserId("userid");
         signUpDto.setPw("passw0rd");
         signUpDto.setUsername("username");
         accountService.processNewAccount(signUpDto);
@@ -91,7 +88,7 @@ class ArticleControllerTest {
         assertThat(article.getArticleTitle()).isEqualTo("articleTitle");
         assertThat(article.getArticleContents()).isEqualTo("articleContents");
 
-        Account account = accountRepository.findById("userid").orElseThrow();
+        Account account = accountRepository.findByUserId("userid").orElseThrow();
         assertThat(account.getPoints()).isEqualTo(3);
     }
 
@@ -125,7 +122,7 @@ class ArticleControllerTest {
     void article_delete_success() throws Exception {
         articleService.writeArticle(articleDto);
 
-        Account account = accountRepository.findById("userid").orElseThrow();
+        Account account = accountRepository.findByUserId("userid").orElseThrow();
         assertThat(account.getPoints()).isEqualTo(3);
 
         mockMvc.perform(delete("/article/articleId")
@@ -175,7 +172,7 @@ class ArticleControllerTest {
         Article article = articleRepository.findById("articleId").orElseThrow();
         assertThat(article.getAccount().getPoints()).isEqualTo(4);
 
-        Account account = accountRepository.findById("userid2").orElseThrow();
+        Account account = accountRepository.findByUserId("userid2").orElseThrow();
         assertThat(account.getPoints()).isEqualTo(2);
     }
 
@@ -201,18 +198,18 @@ class ArticleControllerTest {
         Article article = articleRepository.findById("articleId").orElseThrow();
         assertThat(article.getAccount().getPoints()).isEqualTo(3);
 
-        Account account = accountRepository.findById("userid2").orElseThrow();
+        Account account = accountRepository.findByUserId("userid2").orElseThrow();
         assertThat(account.getPoints()).isEqualTo(0);
     }
 
     private void anotherAccountAndLogin() {
         SignUpDto signUpDto1 = new SignUpDto();
-        signUpDto1.setUserid("userid2");
+        signUpDto1.setUserId("userid2");
         signUpDto1.setPw("passw0rd");
         signUpDto1.setUsername("username");
         accountService.processNewAccount(signUpDto1);
         LoginDto loginDto = new LoginDto();
-        loginDto.setUserid("userid2");
+        loginDto.setUserId("userid2");
         loginDto.setPw("passw0rd");
         accountService.processLogin(loginDto);
     }
