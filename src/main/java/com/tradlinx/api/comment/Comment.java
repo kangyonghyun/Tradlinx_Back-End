@@ -23,7 +23,7 @@ public class Comment {
     Article article;
 
     @ManyToOne
-    @JoinColumn(name = "account_id")
+    @JoinColumn(name = "id")
     Account account;
 
     public void setArticle(Article article) {

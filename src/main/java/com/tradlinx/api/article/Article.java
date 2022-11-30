@@ -22,7 +22,7 @@ public class Article {
     private String articleContents;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "id")
     Account account;
 
     @OneToMany(mappedBy = "article")
