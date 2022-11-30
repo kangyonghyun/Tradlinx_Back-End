@@ -6,10 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,9 +19,9 @@ public class Account {
     public static final int WRITE_COMMENT_POINT = 2;
     public static final int WRITE_WRITER_COMMENT_POINT = 1;
 
-    @Id
-    @Column(name = "user_id")
-    private String userid;
+    @Id @GeneratedValue
+    private Long id;
+    private String userId;
     private String pw;
     private String username;
     private int points;
