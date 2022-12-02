@@ -4,9 +4,9 @@ import lombok.Data;
 
 @Data
 public class JwtToken {
-    String token;
+    private String token;
 
     public JwtToken(String token) {
-        this.token = "Bearer " + token;
+        this.token = token;
     }
 }
