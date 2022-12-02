@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class AccountExceptionController {
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(SignUpException.class)
-    public ErrorResult signUpExceptionExHandler(SignUpException e) {
+    @ExceptionHandler(AccountException.class)
+    public ErrorResult accountExceptionExHandler(AccountException e) {
         return new ErrorResult("BAD", e.getMessage());
     }
 
