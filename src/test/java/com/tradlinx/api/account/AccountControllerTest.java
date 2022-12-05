@@ -1,8 +1,8 @@
 package com.tradlinx.api.account;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.tradlinx.api.account.form.SignInDto;
-import com.tradlinx.api.account.form.SignUpDto;
+import com.tradlinx.api.account.dto.AccountLoginRequest;
+import com.tradlinx.api.account.dto.AccountSaveRequest;
 import org.hamcrest.core.StringStartsWith;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,7 +18,6 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.TestExecutionEvent;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.context.WebApplicationContext;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -41,15 +40,15 @@ class AccountControllerTest {
     @Autowired
     AccountService accountService;
 
-    SignUpDto signUpDto;
+    AccountSaveRequest saveRequest;
 
     @BeforeEach
     void beforeEach() {
-        signUpDto = new SignUpDto();
-        signUpDto.setUserId("userid1");
-        signUpDto.setPw("passw0rd");
-        signUpDto.setUsername("username");
-        accountService.processNewAccount(signUpDto);
+        saveRequest = new AccountSaveRequest();
+        saveRequest.setUserId("userid1");
+        saveRequest.setPw("passw0rd");
+        saveRequest.setUsername("username");
+        accountService.processNewAccount(saveRequest);
     }
 
     @AfterEach
@@ -58,16 +57,16 @@ class AccountControllerTest {
     }
 
     @Test
-    @DisplayName("회원 가입 - 성공")
+    @DisplayName("회원가입 성공")
     void signUp_correct_input_success() throws Exception {
-        signUpDto = new SignUpDto();
-        signUpDto.setUserId("userid");
-        signUpDto.setPw("passw0rd");
-        signUpDto.setUsername("username");
+        saveRequest = new AccountSaveRequest();
+        saveRequest.setUserId("userid");
+        saveRequest.setPw("passw0rd");
+        saveRequest.setUsername("username");
 
         mockMvc.perform(post("/signup")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(signUpDto)))
+                        .content(objectMapper.writeValueAsString(saveRequest)))
                 .andExpect(status().isOk())
                 .andExpect(unauthenticated());
 
@@ -77,30 +76,30 @@ class AccountControllerTest {
     }
 
     @Test
-    @DisplayName("회원 가입 - 실패 (userId 잘못입력)")
+    @DisplayName("회원가입 실패 - 잘못된 아이디 입력")
     void signUp_incorrect_input_fail() throws Exception {
-        signUpDto = new SignUpDto();
-        signUpDto.setUserId("Tuserid");
-        signUpDto.setPw("passw0rd");
-        signUpDto.setUsername("username");
+        saveRequest = new AccountSaveRequest();
+        saveRequest.setUserId("Tuserid");
+        saveRequest.setPw("passw0rd");
+        saveRequest.setUsername("username");
 
         mockMvc.perform(post("/signup")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(signUpDto)))
+                        .content(objectMapper.writeValueAsString(saveRequest)))
                 .andExpect(status().is4xxClientError())
                 .andExpect(jsonPath("code", is("BAD")))
-                .andExpect(jsonPath("message", is("ID 를 잘못 입력했습니다. 다시 입력해주세요")));
+                .andExpect(jsonPath("message", is("ID 를 다시 입력해주세요.")));
     }
 
 //    @WithUserDetails(value = "userid1", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @Test
     @DisplayName("로그인 성공")
     void login_correct_input_success() throws Exception {
-        SignInDto signInDto = new SignInDto();
-        signInDto.setUserId("userid1");
-        signInDto.setPw("passw0rd");
+        AccountLoginRequest accountLoginRequest = new AccountLoginRequest();
+        accountLoginRequest.setUserId("userid1");
+        accountLoginRequest.setPw("passw0rd");
         mockMvc.perform(post("/signin")
-                        .content(objectMapper.writeValueAsString(signInDto))
+                        .content(objectMapper.writeValueAsString(accountLoginRequest))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(header().string(HttpHeaders.AUTHORIZATION, new StringStartsWith("Bearer ")))
                 .andExpect(status().isOk());
@@ -113,17 +112,16 @@ class AccountControllerTest {
     @CsvSource({"nouserid1, passw0rd, 일치하는 ID 가 없습니다.",
             "userid1, nopassw0rdm, 인증 불허가"})
     void login_incorrect_input_fail(String userId, String pw, String message) throws Exception {
-        System.out.println(userId + " " + pw + " " + message );
-        SignInDto signInDto = new SignInDto();
-        signInDto.setUserId(userId);
-        signInDto.setPw(pw);
+        AccountLoginRequest loginRequest = new AccountLoginRequest();
+        loginRequest.setUserId(userId);
+        loginRequest.setPw(pw);
 
-        sign_in_fail_test(signInDto, message);
+        sign_in_fail_test(loginRequest, message);
     }
 
-    private void sign_in_fail_test(SignInDto signInDto, String message) throws Exception {
+    private void sign_in_fail_test(AccountLoginRequest loginRequest, String message) throws Exception {
         mockMvc.perform(post("/signin")
-                        .content(objectMapper.writeValueAsString(signInDto))
+                        .content(objectMapper.writeValueAsString(loginRequest))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(header().doesNotExist(HttpHeaders.AUTHORIZATION))
                 .andExpect(status().is4xxClientError())
