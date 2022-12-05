@@ -1,6 +1,6 @@
 package com.tradlinx.api.account;
 
-import com.tradlinx.api.account.form.*;
+import com.tradlinx.api.account.dto.*;
 import com.tradlinx.api.account.validator.SignInValidator;
 import com.tradlinx.api.account.validator.SignUpValidator;
 import com.tradlinx.api.jwt.JwtFilter;
@@ -22,32 +22,30 @@ import javax.validation.Valid;
 public class AccountController {
 
     private final AccountService accountService;
-    private final AccountRepository accountRepository;
-
     private final SignUpValidator signUpValidator;
     private final SignInValidator signInValidator;
 
-    @InitBinder("signUpDto")
+    @InitBinder("accountSaveRequest")
     public void initBinder1(WebDataBinder webDataBinder) {
         webDataBinder.addValidators(signUpValidator);
     }
 
-    @InitBinder("signInDto")
+    @InitBinder("accountLoginRequest")
     public void initBinder2(WebDataBinder webDataBinder) {
         webDataBinder.addValidators(signInValidator);
     }
 
     @ApiOperation(value = "회원 가입", notes = "회원 가입 API")
     @PostMapping("/signup")
-    public NewSignUpDto signUp(@RequestBody @Valid SignUpDto signUpDto) {
-        String userId = accountService.processNewAccount(signUpDto);
-        return new NewSignUpDto(userId);
+    public AccountSaveResponse signUp(@RequestBody @Valid AccountSaveRequest saveRequest) {
+        String userId = accountService.processNewAccount(saveRequest);
+        return new AccountSaveResponse(userId);
     }
 
     @ApiOperation(value = "로그인", notes = "로그인 API")
     @PostMapping("/signin")
-    public ResponseEntity<JwtToken> signin(@RequestBody @Valid SignInDto signInDto) {
-        String jwt = accountService.processLogin(signInDto);
+    public ResponseEntity<JwtToken> signin(@RequestBody @Valid AccountLoginRequest loginRequest) {
+        String jwt = accountService.processLogin(loginRequest);
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add(JwtFilter.AUTHORIZATION_HEADER, "Bearer " + jwt);
         return new ResponseEntity<>(new JwtToken(jwt), httpHeaders, HttpStatus.OK);
@@ -55,16 +53,14 @@ public class AccountController {
 
     @ApiOperation(value = "회원 조회", notes = "회원 조회 API")
     @GetMapping("/profile")
-    public ResponseEntity<ProfileDto> profile() {
-        ProfileDto profile = accountService.getProfile();
-        return new ResponseEntity<>(profile, HttpStatus.OK);
+    public AccountProfileRequest profile() {
+        return accountService.getProfile();
     }
 
     @ApiOperation(value = "포인트 조회", notes = "포인트 조회 API")
     @GetMapping("/points")
-    public ResponseEntity<PointsDto> points() {
-        PointsDto points = accountService.getPoints();
-        return new ResponseEntity<>(points, HttpStatus.OK);
+    public AccountPointsRequest points() {
+        return accountService.getPoints();
     }
 
 
