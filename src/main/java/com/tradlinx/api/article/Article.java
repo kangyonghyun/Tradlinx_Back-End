@@ -48,4 +48,8 @@ public class Article {
         this.comments.remove(comment);
         this.account.minusWriterCommentPoints();
     }
+
+    public void addWriterCommentPoints() {
+        this.account.addWriterCommentPoints();
+    }
 }

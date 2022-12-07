@@ -13,17 +13,17 @@ import javax.persistence.*;
 @NoArgsConstructor
 public class Comment {
 
-    @Id @Column(name = "comment_id")
-    String commentId;
+    @Id @GeneratedValue
+    Long commentId;
 
     String commentContents;
 
     @ManyToOne
-    @JoinColumn(name = "article_id")
+    @JoinColumn(name = "id")
     Article article;
 
     @ManyToOne
-    @JoinColumn(name = "id")
+    @JoinColumn(name = "account_id")
     Account account;
 
     public void setArticle(Article article) {
@@ -31,14 +31,18 @@ public class Comment {
         article.getComments().add(this);
     }
 
-    public void setAccount(Account account) {
-        this.article.getAccount().addWriterPoints();
-        account.addCommentPoints();
+    public void setAccountAndAddPoints(Account account) {
+        this.account = account;
+        this.account.addCommentPoints();
+        this.article.addWriterCommentPoints();
     }
 
-    public void removeArticle(Account account) {
-        this.article.getComments().remove(article);
-        this.article.getAccount().minusWriterPoints();
-        account.minusCommentsPoint();
+    public void removeCommentAndPoints() {
+        this.article.removeCommentAndPoints(this);
+        this.account.minusCommentsPoint();
+    }
+
+    public void removePoints() {
+        this.account.minusCommentsPoint();
     }
 }
