@@ -1,13 +1,11 @@
 package com.tradlinx.api.article;
 
 import com.tradlinx.api.article.dto.*;
-import com.tradlinx.api.article.validator.ArticleWriteValidator;
 import com.tradlinx.api.exception.ApiException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.Errors;
-import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -18,23 +16,22 @@ import javax.validation.Valid;
 public class ArticleController {
 
     private final ArticleService articleService;
-    private final ArticleWriteValidator articleWriteValidator;
-
-    @InitBinder("articleWriteRequest")
-    public void initBind(WebDataBinder webDataBinder) {
-        webDataBinder.addValidators(articleWriteValidator);
-    }
 
     @ApiOperation(value = "글 작성", notes = "글 작성 API")
     @PostMapping("/article")
-    public ArticleWriteResponse writeArticle(@RequestBody @Valid ArticleWriteRequest writeRequest) {
+    public ArticleWriteResponse writeArticle(@RequestBody @Valid ArticleWriteRequest writeRequest,
+                                             Errors errors) {
+        if (errors.hasErrors()) {
+            throw new ApiException("제목을 입력해주세요.");
+        }
         Long articleId = articleService.writeArticle(writeRequest);
         return new ArticleWriteResponse(articleId);
     }
 
     @ApiOperation(value = "글 수정", notes = "글 수정 API")
     @PutMapping("/article")
-    public ArticleUpdateResponse updateArticle(@RequestBody @Valid ArticleUpdateRequest updateRequest, Errors errors) {
+    public ArticleUpdateResponse updateArticle(@RequestBody @Valid ArticleUpdateRequest updateRequest,
+                                               Errors errors) {
         if (errors.hasErrors()) {
             throw new ApiException("제목을 입력해주세요.");
         }
