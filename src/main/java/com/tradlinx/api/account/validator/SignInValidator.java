@@ -1,7 +1,7 @@
 package com.tradlinx.api.account.validator;
 
 import com.tradlinx.api.account.AccountRepository;
-import com.tradlinx.api.account.exception.AccountException;
+import com.tradlinx.api.exception.ApiException;
 import com.tradlinx.api.account.dto.AccountLoginRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -23,15 +23,10 @@ public class SignInValidator implements Validator {
     public void validate(Object target, Errors errors) {
         AccountLoginRequest loginRequest = (AccountLoginRequest) target;
         if (errors.hasErrors()) {
-            if (errors.hasFieldErrors("userId")) {
-                throw new AccountException("ID 를 다시 입력해주세요.");
-            }
-            if (errors.hasFieldErrors("pw")) {
-                throw new AccountException("패스워드를 다시 입력해주세요.");
-            }
+            throw new ApiException("아이디 또는 비밀번호를 다시 입력해주세요.");
         }
         accountRepository.findByUserId(loginRequest.getUserId())
-                .orElseThrow(() -> new AccountException("일치하는 ID 가 없습니다."));
+                .orElseThrow(() -> new ApiException("일치하는 아이디가 없습니다."));
     }
 
 }

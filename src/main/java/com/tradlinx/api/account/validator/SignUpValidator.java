@@ -1,7 +1,7 @@
 package com.tradlinx.api.account.validator;
 
 import com.tradlinx.api.account.AccountRepository;
-import com.tradlinx.api.account.exception.AccountException;
+import com.tradlinx.api.exception.ApiException;
 import com.tradlinx.api.account.dto.AccountSaveRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
@@ -26,16 +26,16 @@ public class SignUpValidator implements Validator {
         AccountSaveRequest saveRequest = (AccountSaveRequest) target;
         if (errors.hasFieldErrors("userId")) {
 //            throw new AccountException(ms.getMessage("NotBlank.accountSaveRequest.userId", null,null));
-            throw new AccountException("ID 를 다시 입력해주세요.");
+            throw new ApiException("ID 를 다시 입력해주세요.");
         }
         if (errors.hasFieldErrors("pw")) {
-            throw new AccountException("패스워드는 필수값 입니다.");
+            throw new ApiException("패스워드는 필수값 입니다.");
         }
         if (errors.hasFieldErrors("username")) {
-            throw new AccountException("사용자 이름은 필수값 입니다.");
+            throw new ApiException("사용자 이름은 필수값 입니다.");
         }
         if (accountRepository.existsByUserId(saveRequest.getUserId())) {
-            throw new AccountException("이미 있는 ID 입니다. 다시 입력해주세요");
+            throw new ApiException("이미 있는 ID 입니다. 다시 입력해주세요");
         }
     }
 
