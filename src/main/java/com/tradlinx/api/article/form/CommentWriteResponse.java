@@ -3,10 +3,10 @@ package com.tradlinx.api.article.form;
 import lombok.Data;
 
 @Data
-public class NewCommentDto {
-    String commentId;
+public class CommentWriteResponse {
+    Long commentId;
 
-    public NewCommentDto(String commentId) {
+    public CommentWriteResponse(Long commentId) {
         this.commentId = commentId;
     }
 }
