@@ -1,12 +1,16 @@
 package com.tradlinx.api.article;
 
-import com.tradlinx.api.article.form.*;
+import com.tradlinx.api.article.dto.*;
+import com.tradlinx.api.article.validator.ArticleWriteValidator;
+import com.tradlinx.api.exception.ApiException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.validation.Errors;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @RestController
 @RequiredArgsConstructor
@@ -14,47 +18,59 @@ import org.springframework.web.bind.annotation.*;
 public class ArticleController {
 
     private final ArticleService articleService;
+    private final ArticleWriteValidator articleWriteValidator;
+
+    @InitBinder("articleWriteRequest")
+    public void initBind(WebDataBinder webDataBinder) {
+        webDataBinder.addValidators(articleWriteValidator);
+    }
 
     @ApiOperation(value = "글 작성", notes = "글 작성 API")
     @PostMapping("/article")
-    public ResponseEntity<NewArticleDto> writeArticle(@RequestBody ArticleDto articleDto) {
-        String articleId = articleService.writeArticle(articleDto);
-        return new ResponseEntity<>(new NewArticleDto(articleId), HttpStatus.OK);
+    public ArticleWriteResponse writeArticle(@RequestBody @Valid ArticleWriteRequest writeRequest) {
+        Long articleId = articleService.writeArticle(writeRequest);
+        return new ArticleWriteResponse(articleId);
     }
 
     @ApiOperation(value = "글 수정", notes = "글 수정 API")
     @PutMapping("/article")
-    public ResponseEntity<NewArticleDto> updateArticle(@RequestBody ArticleUpdateDto articleUpdateDto) {
-        String articleId = articleService.updateArticle(articleUpdateDto);
-        return new ResponseEntity<>(new NewArticleDto(articleId), HttpStatus.OK);
+    public ArticleUpdateResponse updateArticle(@RequestBody @Valid ArticleUpdateRequest updateRequest, Errors errors) {
+        if (errors.hasErrors()) {
+            throw new ApiException("제목을 입력해주세요.");
+        }
+        Long articleId = articleService.updateArticle(updateRequest);
+        return new ArticleUpdateResponse(articleId);
     }
 
     @ApiOperation(value = "글 삭제", notes = "글 삭제 API")
     @DeleteMapping("/article/{articleId}")
-    public ResponseEntity<DeleteArticleDto> deleteArticle(@PathVariable(name = "articleId") String articleId) {
+    public ArticleDeleteResponse deleteArticle(@PathVariable(name = "articleId") Long articleId) {
         articleService.deleteArticle(articleId);
-        return new ResponseEntity<>(new DeleteArticleDto(), HttpStatus.OK);
+        return new ArticleDeleteResponse(1);
     }
 
     @ApiOperation(value = "글 조회", notes = "글 조회 API")
     @GetMapping("/article/{articleId}")
-    public ResponseEntity<ArticleCommentsDto> getArticle(@PathVariable(name = "articleId") String articleId) {
-        ArticleCommentsDto commentsId = articleService.getCommentsOfArticle(articleId);
-        return new ResponseEntity<>(commentsId, HttpStatus.OK);
+    public ArticleGetResponse getArticle(@PathVariable(name = "articleId") Long articleId) {
+        return articleService.getCommentsOfArticle(articleId);
     }
 
     @ApiOperation(value = "댓글 작성", notes = "댓글 작성 API")
     @PostMapping("/comments")
-    public ResponseEntity<NewCommentDto> writeComment(@RequestBody CommentDto commentDto) {
-       String commentId = articleService.writeComment(commentDto);
-        return new ResponseEntity<>(new NewCommentDto(commentId), HttpStatus.OK);
+    public CommentWriteResponse writeComment(@RequestBody @Valid CommentWriteRequest commentWriteRequest,
+                                             Errors errors) {
+        if (errors.hasErrors()) {
+            throw new ApiException("내용을 입력해주세요.");
+        }
+        Long commentId = articleService.writeComment(commentWriteRequest);
+        return new CommentWriteResponse(commentId);
     }
 
     @ApiOperation(value = "댓글 삭제", notes = "댓글 삭제 API")
     @DeleteMapping("/comments/{commentId}")
-    public ResponseEntity<NewCommentDto> deleteComment(@PathVariable("commentId") String commentId) {
-        String comment = articleService.deleteComment(commentId);
-        return new ResponseEntity<>(new NewCommentDto(comment), HttpStatus.OK);
+    public CommentWriteResponse deleteComment(@PathVariable("commentId") Long commentId) {
+        Long comment = articleService.deleteComment(commentId);
+        return new CommentWriteResponse(comment);
     }
 
 }
