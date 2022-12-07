@@ -15,17 +15,18 @@ import java.util.List;
 @NoArgsConstructor
 public class Article {
 
-    @Id
-    @Column(name = "article_id")
-    private String articleId;
+    @Id @GeneratedValue
+    private Long articleId;
+
     private String articleTitle;
+
     private String articleContents;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id")
+    @JoinColumn(name = "account_id")
     Account account;
 
-    @OneToMany(mappedBy = "article")
+    @OneToMany(mappedBy = "article", orphanRemoval = true)
     List<Comment> comments = new ArrayList<>();
 
     public void setAccount(Account account) {
@@ -34,9 +35,17 @@ public class Article {
         account.addArticlePoints();
     }
 
-    public void removeArticle(Article article) {
-        this.account.getArticles().remove(article);
+    public void removeArticleAndPoints() {
+        this.account.removeArticle(this);
         this.account.minusArticlePoints();
+        for (Comment comment : comments) {
+            this.account.minusWriterCommentPoints();
+            comment.removePoints();
+        }
     }
 
+    public void removeCommentAndPoints(Comment comment) {
+        this.comments.remove(comment);
+        this.account.minusWriterCommentPoints();
+    }
 }
