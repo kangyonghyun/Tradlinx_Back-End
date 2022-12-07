@@ -1,4 +1,4 @@
-package com.tradlinx.api.account.exception;
+package com.tradlinx.api.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
