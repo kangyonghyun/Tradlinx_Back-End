@@ -1,4 +1,4 @@
-package com.tradlinx.api.article.form;
+package com.tradlinx.api.article.dto;
 
 import lombok.Data;
 
