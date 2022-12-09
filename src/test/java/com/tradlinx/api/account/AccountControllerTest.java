@@ -109,7 +109,7 @@ class AccountControllerTest {
 
     @ParameterizedTest
     @DisplayName("로그인 실패 - 잘못된 아이디 입력")
-    @CsvSource({"nouserid1, passw0rd, 일치하는 ID 가 없습니다.",
+    @CsvSource({"nouserid1, passw0rd, 일치하는 아이디가 없습니다.",
             "userid1, nopassw0rdm, 인증 불허가"})
     void login_incorrect_input_fail(String userId, String pw, String message) throws Exception {
         AccountLoginRequest loginRequest = new AccountLoginRequest();

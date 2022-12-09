@@ -5,10 +5,9 @@ import com.tradlinx.api.account.Account;
 import com.tradlinx.api.account.AccountRepository;
 import com.tradlinx.api.account.AccountService;
 import com.tradlinx.api.account.dto.AccountLoginRequest;
-import com.tradlinx.api.article.dto.ArticleUpdateRequest;
+import com.tradlinx.api.article.dto.*;
 import com.tradlinx.api.account.dto.AccountSaveRequest;
-import com.tradlinx.api.article.dto.ArticleWriteRequest;
-import com.tradlinx.api.article.dto.CommentWriteRequest;
+import com.tradlinx.api.comment.Comment;
 import com.tradlinx.api.comment.CommentRepository;
 import org.hamcrest.core.StringStartsWith;
 import org.junit.jupiter.api.AfterEach;
@@ -85,18 +84,20 @@ class ArticleControllerTest {
     @Test
     @DisplayName("글 작성 - 포인트 증가 +3")
     void article_write_success() throws Exception {
-        mockMvc.perform(post("/article")
+        // 글 작성
+        String content = mockMvc.perform(post("/article")
                         .header(HttpHeaders.AUTHORIZATION, new StringStartsWith("Bearer "))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(articleDto)))
                 .andExpect(status().isOk())
-                .andExpect(authenticated())
-                .andExpect(jsonPath("articleId", is(3)));
+                .andExpect(authenticated()).andReturn().getResponse().getContentAsString();
+        ArticleWriteResponse articleWriteResponse = objectMapper.readValue(content, ArticleWriteResponse.class);
 
-        Article article = articleRepository.findById(3L).orElseThrow();
+        Article article = articleRepository.findById(articleWriteResponse.getArticleId()).orElseThrow();
         assertThat(article.getArticleTitle()).isEqualTo("articleTitle");
         assertThat(article.getArticleContents()).isEqualTo("articleContents");
 
+        // 글 작성 3 포인트 증가
         Account account = accountRepository.findByUserId("userid").orElseThrow();
         assertThat(account.getPoints()).isEqualTo(3);
     }
@@ -105,10 +106,12 @@ class ArticleControllerTest {
     @Test
     @DisplayName("글 수정")
     void article_update_success() throws Exception {
-        articleService.writeArticle(articleDto);
+        // 글 작성
+        Long articleId = articleService.writeArticle(articleDto);
 
+        // 글 수정
         ArticleUpdateRequest articleUpdateRequest = new ArticleUpdateRequest();
-        articleUpdateRequest.setArticleId(2L);
+        articleUpdateRequest.setArticleId(articleId);
         articleUpdateRequest.setArticleTitle("updateArticleTitle");
         articleUpdateRequest.setArticleContents("updateArticleContents");
 
@@ -118,9 +121,9 @@ class ArticleControllerTest {
                         .content(objectMapper.writeValueAsString(articleUpdateRequest)))
                 .andExpect(status().isOk())
                 .andExpect(authenticated())
-                .andExpect(jsonPath("articleId", is(2)));
+                .andExpect(jsonPath("articleId", is(articleId.intValue())));
 
-        Article article = articleRepository.findById(2L).orElseThrow();
+        Article article = articleRepository.findById(articleId).orElseThrow();
         assertThat(article.getArticleTitle()).isEqualTo("updateArticleTitle");
         assertThat(article.getArticleContents()).isEqualTo("updateArticleContents");
     }
@@ -129,18 +132,19 @@ class ArticleControllerTest {
     @Test
     @DisplayName("글 삭제 - 포인트 감소 -3")
     void article_delete_success() throws Exception {
-        articleService.writeArticle(articleDto);
+        // 글 작성
+        Long articleId = articleService.writeArticle(articleDto);
 
         Account account = accountRepository.findByUserId("userid").orElseThrow();
         assertThat(account.getPoints()).isEqualTo(3);
-
-        mockMvc.perform(delete("/article/2")
+        // 글 삭제
+        mockMvc.perform(delete("/article/" + articleId)
                         .header(HttpHeaders.AUTHORIZATION, new StringStartsWith("Bearer ")))
                 .andExpect(status().isOk())
                 .andExpect(authenticated())
                 .andExpect(jsonPath("count", is(1)));
-
-        assertThat(articleRepository.findById(2L)).isEmpty();
+        // 글 작성자 -3 포인트
+        assertThat(articleRepository.findById(articleId)).isEmpty();
         assertThat(account.getPoints()).isEqualTo(0);
     }
 
@@ -148,13 +152,14 @@ class ArticleControllerTest {
     @Test
     @DisplayName("글 조회 - commentId 응답")
     void article_get_success() throws Exception {
-        articleService.writeArticle(articleDto);
-
-        mockMvc.perform(get("/article/2")
+        // 글 작성
+        Long articleId = articleService.writeArticle(articleDto);
+        // 글 조회
+        mockMvc.perform(get("/article/" + articleId)
                         .header(HttpHeaders.AUTHORIZATION, new StringStartsWith("Bearer ")))
                 .andExpect(status().isOk())
                 .andExpect(authenticated())
-                .andExpect(jsonPath("articleId", is(2)))
+                .andExpect(jsonPath("articleId", is(articleId.intValue())))
                 .andExpect(jsonPath("commentsId", is(new ArrayList())));
     }
 
@@ -162,12 +167,12 @@ class ArticleControllerTest {
     @Test
     @DisplayName("댓글 작성 - commentId 응답, 댓글 작성자 points +2, 원글 작성자 points +1")
     void comment_write_success() throws Exception {
-        articleService.writeArticle(articleDto);
-
+        // 글 작성
+        Long articleId = articleService.writeArticle(articleDto);
+        // 다른 사용자 로그인해서 댓글 작성
         anotherAccountAndLogin();
-
         CommentWriteRequest commentWriteRequest = new CommentWriteRequest();
-        commentWriteRequest.setArticleId(2L);
+        commentWriteRequest.setArticleId(articleId);
         commentWriteRequest.setCommentContents("commentsContents");
 
         mockMvc.perform(post("/comments")
@@ -175,12 +180,13 @@ class ArticleControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(commentWriteRequest)))
                 .andExpect(status().isOk())
-                .andExpect(authenticated())
-                .andExpect(jsonPath("commentId", is(4)));
+                .andExpect(authenticated());
 
-        Article article = articleRepository.findById(2L).orElseThrow();
+        // 글작성자는 글작성 포인트 3 + 댓글 포인트 1 = 4
+        Article article = articleRepository.findById(articleId).orElseThrow();
         assertThat(article.getAccount().getPoints()).isEqualTo(4);
 
+        // 댓글 작성자는 댓글 포인트 2
         Account account = accountRepository.findByUserId("userid2").orElseThrow();
         assertThat(account.getPoints()).isEqualTo(2);
     }
@@ -189,24 +195,28 @@ class ArticleControllerTest {
     @Test
     @DisplayName("댓글 삭제 - commentId 응답, 댓글 작성자 points -2, 원글 작성자 points -1")
     void comment_delete_success() throws Exception {
-        articleService.writeArticle(articleDto);
-
+        // 글 작성
+        Long articleId = articleService.writeArticle(articleDto);
+        // 다른 사용자 로그인
         anotherAccountAndLogin();
-
+        // 다른 사용자가 댓글 작성
         CommentWriteRequest commentWriteRequest = new CommentWriteRequest();
-        commentWriteRequest.setArticleId(2L);
+        commentWriteRequest.setArticleId(articleId);
         commentWriteRequest.setCommentContents("commentsContents");
-        articleService.writeComment(commentWriteRequest);
+        Long commentId = articleService.writeComment(commentWriteRequest);
 
-        mockMvc.perform(delete("/comments/4")
+        // 다른 사용자가 댓글 삭제
+        mockMvc.perform(delete("/comments/" + commentId)
                         .header(HttpHeaders.AUTHORIZATION, new StringStartsWith("Bearer ")))
                 .andExpect(status().isOk())
                 .andExpect(authenticated())
-                .andExpect(jsonPath("commentId", is(4)));
+                .andExpect(jsonPath("commentId", is(commentId.intValue())));
 
-        Article article = articleRepository.findById(2L).orElseThrow();
+        // 글 작성자는 4 포인트에서 -1 포인트 = 3 포인트
+        Article article = articleRepository.findById(articleId).orElseThrow();
         assertThat(article.getAccount().getPoints()).isEqualTo(3);
 
+        // 댓글 작성자는 1 포인트에서 -1 포인트 = 0 포인트
         Account account = accountRepository.findByUserId("userid2").orElseThrow();
         assertThat(account.getPoints()).isEqualTo(0);
     }
